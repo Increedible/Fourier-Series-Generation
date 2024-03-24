@@ -47,10 +47,10 @@ def getF(t):
     return get_point_at_t(t)
 
 
-print("[", end="")
-for i in range(nmin, nmax):
-    print(i, end=", ")
-print(nmax, end="]\n")
+# print("[", end="")
+# for i in range(nmin, nmax):
+#     print(i, end=", ")
+# print(nmax, end="]\n")
 
 filename = 'output.txt'
 with open(filename, 'w') as file:
