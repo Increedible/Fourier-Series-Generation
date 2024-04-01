@@ -1,6 +1,9 @@
 import pygame
 import math
 import sys
+from svgpathtools import svg2paths
+import numpy as np
+import threading
 
 vectors = []
 filename = 'output.txt'
@@ -11,9 +14,6 @@ with open(filename, 'r') as file:
         # Split each line into parts, convert to integers, and add as a tuple to the list
         parts = line.strip().split()
         vectors.append((float(parts[0]), float(parts[1])))
-
-
-#vectors = [(7.2772, 13.6451), (-13.9084, -1.7512), (-5.0869, 16.3309), (-11.7979, -3.6206), (-17.6697, -4.3589), (-0.9162, -4.5217), (-3.1566, -10.3254), (-0.8754, -7.5877), (9.0232, 5.0451), (3.475, -5.9641), (2.4576, 15.243), (-2.3636, 6.623), (-13.1967, 1.5876), (9.1522, 9.4259), (-24.6393, -2.7501), (1.4226, 3.28), (-1.121, -3.2547), (-4.8342, -10.173), (-1.8799, 21.5382), (7.0181, -12.4367), (-8.7996, -1.7844), (11.552, 30.058), (-8.6258, -1.2038), (-20.4885, 7.628), (16.9342, 9.4306), (-46.7804, 9.8435), (39.9425, 0.2306), (-60.3412, -13.4341), (67.2215, 23.4871), (-16.0712, 48.6034), (-23.4232, 13.4289), (-41.0541, 77.6105), (-27.6493, 49.1955), (-142.5409, -9.2976), (-139.0786, 6.377), (1.9059, -115.8902), (-136.3605, -123.0095), (113.554, -1.4793), (-178.3022, -211.0675), (388.9479, 38.2053), (-232.2855, -61.6152), (89.3318, 140.9238), (112.5342, -142.7107), (-48.4444, -210.5927), (314.9326, 666.004), (-235.5584, 277.4166), (-818.0671, -925.8307), (377.7691, 1095.7279), (2109.8041, 633.4393), (13291.9224, -463.036), (0, 0), (1087.4871, 2334.3749), (848.5668, 2281.3068), (-982.0751, -651.612), (4.8855, 301.5443), (281.477, 688.8087), (-493.894, -384.9499), (-26.8724, -1.635), (276.7455, 233.8254), (-12.902, -160.8482), (-77.0205, 352.957), (57.3221, 16.9443), (-112.4083, 141.4367), (-131.3489, 81.9729), (-175.0252, -4.4085), (-28.6402, -81.9898), (-55.0321, -43.6967), (-46.9419, -45.2387), (54.6957, -45.6999), (-5.2952, -19.5096), (28.6959, -14.1242), (-13.6036, 66.2251), (20.1226, -79.8473), (-27.954, 49.7816), (38.9089, -9.1874), (-25.5839, -8.5286), (23.9517, 7.7374), (5.028, 7.8691), (4.0274, 20.0604), (3.9491, 8.4524), (-21.0283, 12.2079), (20.3692, 18.7491), (-32.8898, 13.811), (-6.0215, -6.196), (-16.1574, 20.3613), (-0.6815, -18.88), (-24.3441, 4.3459), (11.7061, -4.4452), (-3.0195, -13.1962), (7.2697, 14.6649), (1.9793, 2.2758), (-4.5217, 9.9531), (1.2498, 13.8049), (-20.2719, 5.2795), (-7.4513, 2.1815), (-10.2804, -0.0864), (-7.8938, -13.1798), (0.5032, 6.553), (4.2472, -9.4946), (-3.2308, 5.9817), (7.2772, 13.6451)]
 
 base_angle_vectors = []
 last_angle_vectors = []
@@ -37,11 +37,18 @@ RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 
 # Initial scale and origin offset
-scale = 100  # Pixels per unit
+beginscale = 0.003
+scale = beginscale  # Pixels per unit
 origin_x, origin_y = width // 2, height // 2
 
 # Arrowhead size as a percentage of the vector length
 arrowhead_percentage = 0.15
+
+def pointborderdist(point, maxdist):
+    val = math.sqrt(point[0]**2 + point[1]**2)/maxdist
+    if val > 1:
+        return 1
+    return val
 
 # Function to draw an arrow
 def draw_arrow(screen, start, end, color, thickness=2):
@@ -89,7 +96,7 @@ def draw_slider(screen, x, y, width, height, value, min_value, max_value):
 
 # Define the Clear button dimensions and position
 clear_button_x = slider_x
-clear_button_y = slider_y - 35  # Position above the slider
+clear_button_y = slider_y - 105  # Position above the slider
 clear_button_width = slider_width
 clear_button_height = 25
 
@@ -101,13 +108,11 @@ def draw_clear_button(screen, x, y, width, height, text):
     text_rect = text_surf.get_rect(center=(x + width / 2, y + height / 2))  # Center text
     screen.blit(text_surf, text_rect)  # Draw text
 
-# Define the Clear button dimensions and position
 move_cam_button_x = clear_button_x
-move_cam_button_y = clear_button_y - 35  # Position above the slider
+move_cam_button_y = clear_button_y + 35
 move_cam_button_width = slider_width
 move_cam_button_height = 25
 
-# Function to draw the Clear button
 def draw_move_cam_button(screen, x, y, width, height, text):
     pygame.draw.rect(screen, GREY, (x, y, width, height))  # Button rectangle
     font = pygame.font.Font(None, 24)  # Adjust font size as needed
@@ -115,19 +120,73 @@ def draw_move_cam_button(screen, x, y, width, height, text):
     text_rect = text_surf.get_rect(center=(x + width / 2, y + height / 2))  # Center text
     screen.blit(text_surf, text_rect)  # Draw text
 
+slow_button_x = slider_x
+slow_button_y = slider_y - 35
+slow_button_width = slider_width
+slow_button_height = 25
+
+# Function to draw the Clear button
+def draw_slow_button(screen, x, y, width, height, text):
+    pygame.draw.rect(screen, GREY, (x, y, width, height))  # Button rectangle
+    font = pygame.font.Font(None, 24)  # Adjust font size as needed
+    text_surf = font.render(text, True, WHITE)  # Render the text
+    text_rect = text_surf.get_rect(center=(x + width / 2, y + height / 2))  # Center text
+    screen.blit(text_surf, text_rect)  # Draw text
+
 # Function to update the slider value based on mouse position
-def update_slider_value(x, y, width, min_value, max_value, mouse_x):
+def update_slider_value(x, width, min_value, max_value, mouse_x):
     if mouse_x < x:
         mouse_x = x
     elif mouse_x > x + width:
         mouse_x = x + width
     return min_value + (mouse_x - x) / width * (max_value - min_value)
 
+def clear(screen):
+    screen.fill(BLACK)
+    pygame.draw.line(screen, GREY, (origin_x, 0), (origin_x, height))
+    pygame.draw.line(screen, GREY, (0, origin_y), (width, origin_y))
+
 slider_dragging = False
 path_points = []  # Initialize empty list to store path points
 movecambool = False
 # Initialize a reference time for rotations
 rotation_reference_time = pygame.time.get_ticks()
+slowbool = False
+drawing = False
+
+fullvectors = []
+drawpoints = []
+
+def getF(t):
+    bar = t * len(drawpoints)
+    ni = math.floor(bar)
+    prog = bar - ni
+    ndx = (drawpoints[(ni+1) % len(drawpoints)][0] - drawpoints[ni][0])
+    ndy = (drawpoints[(ni+1) % len(drawpoints)][1] - drawpoints[ni][1])
+    return drawpoints[ni][0] + prog * ndx, drawpoints[ni][1] + prog * ndy
+
+# for i in range(8):
+#     print(getF(i * 0.125))
+# exit()
+
+def generateVectors(nrange):
+    dt = 1/(nrange * 2)
+
+    for nn in range(nrange * 2 + 1):
+        n = (math.ceil(nn / 2) * (-1)**nn)
+        vx = 0
+        vy = 0
+        for k in range(int(1/dt)):
+            a,b = getF(k*dt)
+            c = math.cos(-n*2*math.pi*k*dt)
+            d = math.sin(-n*2*math.pi*k*dt)
+            vx += a * c - b * d
+            vy += b * c + a * d
+        # if n == 0:
+        #     vx, vy = 0, 0
+        fullvectors.append((vx, vy))
+
+numdrawvectors = 350
 
 while running:
     for event in pygame.event.get():
@@ -135,19 +194,75 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.pos[0] >= slider_x and event.pos[0] <= slider_x + slider_width and event.pos[1] >= slider_y and event.pos[1] <= slider_y + slider_height:
+        elif event.type == pygame.MOUSEBUTTONDOWN and not drawing:
+            if slider_x <= event.pos[0] <= slider_x + slider_width and slider_y <= event.pos[1] <= slider_y + slider_height:
                 slider_dragging = True
-                slider_value = update_slider_value(slider_x, slider_y, slider_width, slider_min, slider_max, event.pos[0])
+                slider_value = update_slider_value(slider_x, slider_width, slider_min, slider_max, event.pos[0])
                 unit = slider_value  # Update unit based on slider value
-            elif event.pos[0] >= clear_button_x and event.pos[0] <= clear_button_x + clear_button_width and event.pos[1] >= clear_button_y and event.pos[1] <= clear_button_y + clear_button_height:
+            elif clear_button_x <= event.pos[0] <= clear_button_x + clear_button_width and clear_button_y <= event.pos[1] <= clear_button_y + clear_button_height:
                 path_points.clear()  # Clear the path points
-            elif event.pos[0] >= move_cam_button_x and event.pos[0] <= move_cam_button_x + move_cam_button_width and event.pos[1] >= move_cam_button_y and event.pos[1] <= move_cam_button_y + move_cam_button_height:
+            elif move_cam_button_x <= event.pos[0] <= move_cam_button_x + move_cam_button_width and move_cam_button_y <= event.pos[1] <= move_cam_button_y + move_cam_button_height:
                 movecambool = False if movecambool else True
+            elif slow_button_x <= event.pos[0] <= slow_button_x + slow_button_width and slow_button_y <= event.pos[1] <= slow_button_y + slow_button_height:
+                if slowbool:
+                    slowbool = False
+                    unit /= 100
+                    slider_max /= 100
+                    slider_value /= 100
+                else:
+                    slowbool = True
+                    unit *= 100
+                    slider_max *= 100
+                    slider_value *= 100
+                for i in range(len(vectors)):
+                    base_angle_vectors[i] = last_angle_vectors[i]
+                    rotation_reference_time = pygame.time.get_ticks()
             elif event.button == 2:  # Middle mouse button
                 movement = True
                 mousedx, mousedy = event.pos
+            elif not drawing:
+                drawing = True
+                drawpoints = []
+                clear(screen)
         elif event.type == pygame.MOUSEBUTTONUP:
+            if drawing:
+                drawing = False
+                if len(drawpoints) > 2:
+                    fullvectors = []
+                    drawpoints = [((point[0] - origin_x) * (beginscale/scale), -(point[1] - origin_y) * (beginscale/scale)) for point in drawpoints]
+                    t = threading.Thread(target=generateVectors, args=(numdrawvectors,))
+                    t.start()
+                    while len(fullvectors) < numdrawvectors * 2 + 1:
+                        clear(screen)
+                        start_x, start_y = origin_x, origin_y  # Start from the origin
+                        end_x, end_y = start_x, start_y
+                        copy_fullvectors = fullvectors.copy()
+                        for i in range(len(copy_fullvectors)):
+                            vector = copy_fullvectors[i]
+
+                            # Scale and draw the rotated vector
+                            end_x = start_x + vector[0] * scale
+                            end_y = start_y - vector[1] * scale  # Negative for screen coordinates
+
+                            draw_arrow(screen, (start_x, start_y), (end_x, end_y), (255, 0, 0))
+                            start_x, start_y = end_x, end_y  # Update start for the next vector
+                        pygame.display.flip()
+
+                    t.join()
+                    vectors = []
+                    for i in range(numdrawvectors * 2 + 1):
+                        vectors.append((0, 0))
+                    for nn in range(numdrawvectors * 2 + 1):
+                        vectors[numdrawvectors + (math.ceil(nn / 2) * (-1)**nn)] = fullvectors[nn]
+
+                    base_angle_vectors = []
+                    last_angle_vectors = []
+                    for vector in vectors:
+                        base_angle_vectors.append(0)
+                        last_angle_vectors.append(0)
+                    path_points = []
+                    rotation_reference_time = pygame.time.get_ticks()
+
             slider_dragging = False
             if event.button == 2:  # Middle mouse button
                 movement = False
@@ -172,13 +287,19 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEMOTION:
             if slider_dragging:
                 old_unit = unit
-                slider_value = update_slider_value(slider_x, slider_y, slider_width, slider_min, slider_max, event.pos[0])
+                slider_value = update_slider_value(slider_x, slider_width, slider_min, slider_max, event.pos[0])
                 unit = slider_value  # Update unit based on slider value
                 if old_unit != unit:
                     for i in range(len(vectors)):
                         base_angle_vectors[i] = last_angle_vectors[i]
                     rotation_reference_time = pygame.time.get_ticks()
 
+    if drawing:
+        drawpoints.append(pygame.mouse.get_pos())
+        if len(drawpoints) > 1:
+            pygame.draw.lines(screen, YELLOW, False, drawpoints[-2:], 4)
+        pygame.display.flip()
+        continue
 
     if movement:
         new_mouse_x, new_mouse_y = pygame.mouse.get_pos()
@@ -189,23 +310,20 @@ while running:
 
         mousedx, mousedy = new_mouse_x, new_mouse_y
 
-    # Fill the background
-    screen.fill(BLACK)
+    clear(screen)
 
     draw_slider(screen, slider_x, slider_y, slider_width, slider_height, slider_value, slider_min, slider_max)
     draw_clear_button(screen, clear_button_x, clear_button_y, clear_button_width, clear_button_height, "Clear")
     draw_move_cam_button(screen, move_cam_button_x, move_cam_button_y, move_cam_button_width, move_cam_button_height, "Move Cam")
-
-    # Draw the axes
-    pygame.draw.line(screen, GREY, (origin_x, 0), (origin_x, height))
-    pygame.draw.line(screen, GREY, (0, origin_y), (width, origin_y))
+    draw_slow_button(screen, slow_button_x, slow_button_y, slow_button_width, slow_button_height, "100x Slow")
 
     # Time-based rotation
     current_time = pygame.time.get_ticks()  # Get current time in milliseconds
     start_x, start_y = origin_x, origin_y  # Start from the origin
     end_x, end_y = start_x, start_y
     middle_index = len(vectors) // 2  # Find the middle index
-
+    trenddown = True
+    r = 255
     for i in range(len(vectors)):
         index = middle_index + (math.ceil(i / 2) * (-1)**i)
         vector = vectors[index]
@@ -220,14 +338,19 @@ while running:
         # Scale and draw the rotated vector
         end_x = start_x + rotated_vector[0] * scale
         end_y = start_y - rotated_vector[1] * scale  # Negative for screen coordinates
-        draw_arrow(screen, (start_x, start_y), (end_x, end_y), RED)
+        #fulldist = math.sqrt(width**2 + height**2) * 0.8
+
+        #r = 100 + (1 - (pointborderdist((start_x, start_y), fulldist) + pointborderdist((end_x, end_y), fulldist)) / 2) * 155
+        draw_arrow(screen, (start_x, start_y), (end_x, end_y), (r, 0, 0))
         start_x, start_y = end_x, end_y  # Update start for the next vector
+
 
     if (end_x, end_y) not in path_points:
         path_points.append((end_x, end_y))  # Add end point to path_points list
+
     # Draw path
     if len(path_points) > 1:
-        pygame.draw.lines(screen, YELLOW, False, path_points, 2)  # Draw yellow line
+        pygame.draw.lines(screen, YELLOW, False, path_points, 4)  # Draw yellow line
 
     # Update the display
     pygame.display.flip()
@@ -236,14 +359,16 @@ while running:
     if movecambool:
         # Calculate the midpoint of the screen to center the camera
         screen_mid_x, screen_mid_y = width // 2, height // 2
-        dx = screen_mid_x - end_x - origin_x
-        dy = screen_mid_y - end_y - origin_y
+        dx = screen_mid_x - end_x
+        dy = screen_mid_y - end_y
         # Adjust the origin to center the end of the arrow path
-        origin_x += dx
-        origin_y += dy
+        origin_x += screen_mid_x - end_x
+        origin_y += screen_mid_y - end_y
 
         # Optionally, adjust path_points if they are being displayed relative to the origin
         path_points = [(x + dx, y + dy) for x, y in path_points]
+
+
 
 
 # Quit pygame
