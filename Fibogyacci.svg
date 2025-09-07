@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg" xmlns:ns1="http://sozi.baierouge.fr" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg3558" style="stroke-linecap:round" sodipodi:docname="golden-spiral.svg" version="1.1" inkscape:version="0.47 r22583" viewBox="0 0 296.99999 209.99999">
+  <sodipodi:namedview id="namedview3588" bordercolor="#666666" inkscape:pageshadow="2" guidetolerance="10" pagecolor="#ffffff" gridtolerance="10" inkscape:window-maximized="0" inkscape:zoom="0.68942858" objecttolerance="10" borderopacity="1" inkscape:current-layer="svg3558" inkscape:cx="553.33221" inkscape:cy="372.04724" inkscape:window-y="0" inkscape:window-x="0" inkscape:window-width="1071" showgrid="false" inkscape:pageopacity="0" inkscape:window-height="760"/>
+  <g id="g4368" transform="matrix(.88522 0 0 .88522 4.8802 -5.9104)">
+    <path id="path3560" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m200.41 25.368a199.85 199.85 0 0 0 -199.85 199.84"/>
+    <path id="path3562" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m323.92 148.88a123.51 123.51 0 0 0 -123.51 -123.51"/>
+    <path id="path3564" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m247.59 225.21a76.335 76.335 0 0 0 76.334 -76.335"/>
+    <path id="path3566" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m200.41 178.04a47.176 47.176 0 0 0 47.176 47.176"/>
+    <path id="path3568" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m229.57 148.88a29.159 29.159 0 0 0 -29.158 29.159"/>
+    <path id="path3570" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m247.59 166.9a18.018 18.018 0 0 0 -18.02 -18.02"/>
+    <ellipse id="ellipse3572" sodipodi:rx="0" sodipodi:ry="0" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:.56444;fill:none" cx="1" cy="102" rx="0" transform="matrix(1.996 0 0 1.996 -1.4327 21.619)" ry="0" sodipodi:cy="102" sodipodi:cx="1"/>
+    <path id="path3574" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m236.44 178.04a11.141 11.141 0 0 0 11.142 -11.141"/>
+    <path id="path3576" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m229.57 171.16a6.8769 6.8769 0 0 0 6.8763 6.8769"/>
+    <path id="path3578" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m233.83 166.9a4.2639 4.2639 0 0 0 -4.2635 4.2639"/>
+    <path id="path3580" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m236.44 169.51a2.613 2.613 0 0 0 -2.6128 -2.613"/>
+    <path id="path3582" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m234.79 171.16a1.6509 1.6509 0 0 0 1.6507 -1.6509"/>
+    <path id="path3584" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m233.83 170.2a0.96205 0.96205 0 0 0 0.96209 0.96209"/>
+    <path id="path3586" style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:1.1266;fill:none" d="m234.52 169.51a0.68888 0.68888 0 0 0 -0.68863 0.68883"/>
+  </g>
+  <metadata>
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
+        <dc:publisher>
+          <cc:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title>Fibonacci spiral</dc:title>
+        <dc:date>2011-07-05T15:49:01</dc:date>
+        <dc:description>The fibonacci spiral</dc:description>
+        <dc:source>https://openclipart.org/detail/148375/fibonacci-spiral-by-nbpetersen</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>nbpetersen</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>Fibonacci</rdf:li>
+            <rdf:li>Golden</rdf:li>
+            <rdf:li>Spiral</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>
