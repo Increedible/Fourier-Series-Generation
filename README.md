@@ -11,5 +11,3 @@ A public Python repo that uses SvgPathTools and PyGame to create and visualize a
 1. Think of what you want to render.
 2. Run the program on any .svg
 3. Draw your shape (by clicking and holding mouse 1) and let the program do the magic!
-
-Warning: The 'Move Camera' button is not implemented correctly yet! Don't use it :)
